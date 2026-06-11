@@ -38,7 +38,7 @@ def find_products(products,pr_id):
 
 def get_valid_id(products): 
     while True: 
-        pr_id = input("Nhập mã sản phẩm").strip().upper()
+        pr_id = input("Nhập mã sản phẩm: ").strip().upper()
         if not pr_id: 
             print("Mã sản phẩm không được để trống!")
             continue 
