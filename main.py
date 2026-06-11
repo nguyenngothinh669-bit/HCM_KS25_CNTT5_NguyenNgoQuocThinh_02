@@ -4,13 +4,13 @@ def display_products(products):
         print("Danh sách hiện tại đang trống!")
         return 
     
-    header = f"| {'Mã SP':<10} | {'Tên sản phảm':<35} | {'Đơn giá':<15} | {'Số lượng':<10} | {'Tổng giá trị':<15} | {'Trạng thái':<20} |"
+    header = f"| {'Mã SP':<10} | {'Tên sản phảm':<35} | {'Đơn giá':<15} | {'Số lượng':<10} | {'Tổng giá trị':<15} | {'Trạng thái':<30} |"
     print("-"*len(header))
     print(header)
     print("-"*len(header)) 
     
     for pr in products:
-        row = f"| {pr['id']:<10} | {pr['name_product']:<35} | {pr['amount']:<15,.0f} | {pr['stock']:<10} | {pr['safety_stock']:<15,.0f} | {pr['status']:<20} |"
+        row = f"| {pr['id']:<10} | {pr['name_product']:<35} | {pr['amount']:<15,.0f} | {pr['stock']:<10} | {pr['safety_stock']:<15,.0f} | {pr['status']:<30} |"
         print(row)
     print("-"*len(header)) 
     
@@ -19,7 +19,7 @@ def display_products(products):
 def calculate_total_value(amount,stock): 
     return amount * stock
 
-def classif_stock(stock,safety_stock): 
+def classify_stock(stock,safety_stock): 
     if stock == 0:
         return 'Hết hàng'
     elif stock < safety_stock:
@@ -106,7 +106,7 @@ def add_products(products):
     safety_stock = get_valid_safety_stock() 
     
     total_value = calculate_total_value(amount,stock)
-    status = classif_stock(amount,safety_stock) 
+    status = classify_stock(amount,safety_stock) 
     
     new_products = {
         'id': pr_id,
@@ -120,7 +120,42 @@ def add_products(products):
     products.append(new_products)
     print(">> Đã thêm thành công đơn hàng")
     
-
+def update_products (products): 
+    print("\n=== CẬP NHẬT SẢN PHẨM ===")
+    if not products:
+        print("Hiện tại không có sản phẩm trong hệ thống nên không thể xóa!")
+        return 
+    
+    pr_id = input("Nhập mã sản phẩm muốn cập nhật: ").strip().upper()
+    if not pr_id: 
+        print("Mã sản phẩm không được để trống!")
+        return 
+    
+    index = find_products(products,pr_id)
+    if index == -1: 
+        print("Lỗi: Không tìm thấy mã trong danh sách!") 
+        return 
+    
+    print(f"Đã tìm thấy mã sản phẩm {pr_id}")
+    new_amount = get_valid_amount()
+    new_stock = get_valid_stock() 
+    new_safety_stock = get_valid_safety_stock() 
+    
+    new_total_value = calculate_total_value(new_amount,new_stock) 
+    new_status = classify_stock(new_stock,new_safety_stock) 
+    
+    products[index] = {
+            'id': pr_id,
+            'name_product': products[index]['name_product'],
+            'amount': new_amount,
+            'stock':new_stock,
+            'safety_stock': new_safety_stock , 
+            'total_value': new_total_value,
+            'status': new_status
+        }
+    
+    print("Đã cập nhật thành công!")
+    
 def delete_products(products): 
     print("\n=== XÓA SẢN PHẨM ===")
     if not products:
@@ -221,6 +256,8 @@ def main():
                 display_products(products)
             case "2": 
                 add_products(products) 
+            case "3": 
+                update_products(products) 
             case "4":
                 delete_products(products) 
             case "5":
