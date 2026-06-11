@@ -4,22 +4,22 @@ def display_products(products):
         print("Danh sách hiện tại đang trống!")
         return 
     
-    header = f"| {'Mã SP':<10} | {'Tên sản phảm':<35} | {'Đơn giá':<15} | {'Số lượng':<10} | {'Tổng giá trị':<15} | {'Trạng thái':<10} |"
+    header = f"| {'Mã SP':<10} | {'Tên sản phảm':<35} | {'Đơn giá':<15} | {'Số lượng':<10} | {'Tổng giá trị':<15} | {'Trạng thái':<20} |"
     print("-"*len(header))
     print(header)
     print("-"*len(header)) 
     
     for pr in products:
-        row = f"| {pr['id']:<10} | {pr['name_product']:<35} | {pr['amount']:<15,.0f} | {pr['stock']:<10} | {pr['safety_stock']:<15,.0f} | {pr['status']:<10} |"
+        row = f"| {pr['id']:<10} | {pr['name_product']:<35} | {pr['amount']:<15,.0f} | {pr['stock']:<10} | {pr['safety_stock']:<15,.0f} | {pr['status']:<20} |"
         print(row)
     print("-"*len(header)) 
     
+
     
-def calculate_safety_stock(amount,stock): 
+def calculate_total_value(amount,stock): 
     return amount * stock
 
 def classif_stock(stock,safety_stock): 
-    st = stock / safety_stock 
     if stock == 0:
         return 'Hết hàng'
     elif stock < safety_stock:
@@ -35,6 +35,91 @@ def find_products(products,pr_id):
             return i
         
     return -1 
+
+def get_valid_id(products): 
+    while True: 
+        pr_id = input("Nhập mã sản phẩm").strip().upper()
+        if not pr_id: 
+            print("Mã sản phẩm không được để trống!")
+            continue 
+        if find_products(products,pr_id) != -1: 
+            print("Mã sản phẩm đẫ tồn tại trong hệ thống!")
+            continue 
+        return pr_id 
+    
+def get_valid_name_product(): 
+    while True: 
+        name_product = input("Nhập tên sản phẩm: ").strip().capitalize()
+        if not name_product: 
+            print("Tên sản phẩm không được để trống!")
+            continue 
+        return name_product
+
+def get_valid_amount(): 
+    while True: 
+        try: 
+            amount = float(input("Nhập đơn giá vốn (>0): ").strip())
+            if amount <= 0: 
+                print("Đơn giá không được âm!")
+                continue 
+            if not amount: 
+                print("Không được để trống!")
+                continue 
+            return amount 
+        except ValueError: 
+            print("Vui lòng nhập lại đơn giá!")
+            
+def get_valid_stock(): 
+    while True: 
+        try: 
+            stock = float(input("Nhập số lượng tồn kho (>0): ").strip())
+            if stock <= 0: 
+                print("Số lượng tồn kho không được âm!")
+                continue 
+            if not stock: 
+                print("Không được để trống!")
+                continue 
+            return stock 
+        except ValueError: 
+            print("Vui lòng nhập lại số lượng !")
+            
+def get_valid_safety_stock(): 
+    while True: 
+        try: 
+            safety_stock = float(input("Nhập định mức tối thiểu (>0): ").strip())
+            if safety_stock <= 0: 
+                print("Định mức tối thiểu không được âm!")
+                continue 
+            if not safety_stock: 
+                print("Không được để trống!")
+                continue 
+            return safety_stock 
+        except ValueError: 
+            print("Vui lòng nhập lại định mức !")
+
+def add_products(products): 
+    print("\n=== THÊM SẢN PHẨM ===")
+    pr_id = get_valid_id(products)
+    name_product =get_valid_name_product()
+    amount = get_valid_amount()
+    stock = get_valid_stock()
+    safety_stock = get_valid_safety_stock() 
+    
+    total_value = calculate_total_value(amount,stock)
+    status = classif_stock(amount,safety_stock) 
+    
+    new_products = {
+        'id': pr_id,
+        'name_product':name_product,
+        'amount': amount,
+        'stock':stock,
+        'safety_stock': safety_stock, 
+        'total_value': total_value,
+        'status': status
+    }
+    products.append(new_products)
+    print(">> Đã thêm thành công đơn hàng")
+    
 
 def delete_products(products): 
     print("\n=== XÓA SẢN PHẨM ===")
@@ -134,6 +219,8 @@ def main():
         match choice: 
             case "1":
                 display_products(products)
+            case "2": 
+                add_products(products) 
             case "4":
                 delete_products(products) 
             case "5":
